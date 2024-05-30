@@ -1,0 +1,26 @@
+// {
+//   "version": "0.2.0",
+//   "configurations": [
+//     {
+//       "type": "espidf",
+//       "name": "Launch",
+//       "request": "launch"
+//     }
+//   ]
+// }
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Wokwi GDB",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build/your-firmware.elf",
+      "cwd": "${workspaceFolder}",
+      "MIMode": "gdb",
+//      "miDebuggerPath": "/usr/local/bin/xtensa-esp32-elf-gdb",
+      "miDebuggerPath": "${command:espIdf.getXtensaGdb}",
+      "miDebuggerServerAddress": "localhost:8883"
+    }
+  ]
+}
