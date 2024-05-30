@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Icon Cửa</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/paho-mqtt/1.0.1/mqttws31.min.js"></script>
+</head>
+<body>
+    <div class="group-48097148">
+        <div class="group-48097146">
+            <span class="off" onclick="toggleSwitch(this)">
+                Off
+            </span>
+            <div class="group-48097145">
+                <div class="ellipse-200" onclick="toggleSwitch(this)">
+                </div>
+            </div>
+        </div>
+        <div class="group-48097147">
+            <div class="door-icon">
+                <div class="window"></div>
+                <div class="handle"></div>
+                <div class="bottom-border"></div>
+            </div>
+        </div>
+        <span class="door">
+            Door
+        </span>
+    </div>
+
+    <script>
+        var client;
+
+        function connectMQTT() {
+            client = new Paho.MQTT.Client("d461e7a5dbd3402da2b7fccff53666ad.s1.eu.hivemq.cloud", 8884, "/mqtt", "clientId");
+
+            client.onConnectionLost = onConnectionLost;
+            client.onMessageArrived = onMessageArrived;
+
+            client.connect({
+                onSuccess: onConnect,
+                userName: "ce232",
+                password: "Tuong12345",
+                useSSL: true
+            });
+
+            function onConnect() {
+                console.log("Đã kết nối đến MQTT broker");
+            }
+
+            function onConnectionLost(responseObject) {
+                if (responseObject.errorCode !== 0) {
+                    console.log("onConnectionLost:" + responseObject.errorMessage);
+                }
+            }
+
+            function onMessageArrived(message) {
+                console.log("onMessageArrived:" + message.payloadString);
+            }
+        }
+
+        function sendMQTTMessage(message) {
+            if (client && client.isConnected()) {
+                var mqttMessage = new Paho.MQTT.Message(message);
+                mqttMessage.destinationName = "/smarthome/servo";
+                client.send(mqttMessage);
+            }
+        }
+
+        function toggleSwitch(element) {
+            var ellipse = document.querySelector('.ellipse-200');
+            var offText = document.querySelector('.off');
+            ellipse.classList.toggle('on');
+            if (ellipse.classList.contains('on')) {
+                offText.textContent = 'On';
+                sendMQTTMessage('open');
+            } else {
+                offText.textContent = 'Off';
+                sendMQTTMessage('close');
+            }
+        }
+
+        window.onload = connectMQTT;
+    </script>
+</body>
+</html>
